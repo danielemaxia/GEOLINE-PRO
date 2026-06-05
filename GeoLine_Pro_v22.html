@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GeoLine Pro</title>
+<style>
+:root{--blue:#0b5cab;--blue2:#083f75;--bg:#f3f6fa;--card:#fff;--text:#18212f;--muted:#64748b;--line:#d9e2ef}
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);margin:0;color:var(--text)}
+.header{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;padding:18px 16px}
+.header h1{margin:0;font-size:24px}.header p{margin:6px 0 0;color:#dbeafe}
+.wrap{max-width:940px;margin:auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(15,23,42,.08)}
+h2{margin:0 0 12px;font-size:21px}h3{margin:18px 0 10px;font-size:16px;color:var(--blue2)}
+label{font-weight:700;font-size:14px}
+input,select{width:100%;padding:12px;margin-top:6px;border:1px solid #cbd5e1;border-radius:12px;font-size:16px;background:#fff;transition:border-color .15s ease, box-shadow .15s ease}
+input:focus,select:focus{outline:none;border-color:#2f80ed;box-shadow:0 0 0 3px rgba(47,128,237,.14)}
+button{
+  background:linear-gradient(135deg,#2f80ed,#0b5cab);
+  color:#fff;
+  border:none;
+  padding:12px 18px;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 5px 14px rgba(11,92,171,.22);
+  transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 9px 20px rgba(11,92,171,.28);
+  filter:brightness(1.04);
+}
+button:active{
+  transform:translateY(0);
+  box-shadow:0 4px 10px rgba(11,92,171,.20);
+}
+button.reset{
+  background:linear-gradient(135deg,#f1f5f9,#dbe5f0);
+  color:#0f172a;
+  box-shadow:0 4px 12px rgba(15,23,42,.10);
+}
+button.reset:hover{
+  box-shadow:0 7px 18px rgba(15,23,42,.14);
+}
+.tab{
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.tab:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 14px rgba(15,23,42,.12);
+}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row{margin-bottom:12px}
+.note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px;color:#1e3a8a;margin-bottom:14px}
+.warn{background:#f8fafc;border:1px solid #dbe5f0;border-radius:14px;padding:12px;color:#475569;margin-top:12px}
+.result{background:#ecfdf5;border:1px solid #99f6e4;border-radius:14px;padding:12px;margin-top:14px;color:#064e3b;line-height:1.45}
+.alertbox{background:#fff7ed;border:1px solid #fdba74;border-radius:14px;padding:10px 12px;margin-top:10px;color:#9a3412;font-weight:700}
+.alertbox.soft{background:#fffbeb;border-color:#fde68a;color:#92400e}
+.small{color:var(--muted);font-size:13px;line-height:1.45}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
+.tab{padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--blue2);font-weight:700}
+.tab.active{background:var(--blue);color:#fff}
+.module{display:none}.module.active{display:block}
+.schema{font-weight:700;text-align:center;background:#f8fafc;border:1px dashed #94a3b8;border-radius:12px;padding:10px;margin:10px 0}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header class="header">
+  <h1>GeoLine Pro</h1>
+  <p>Strumenti per regolazione e verifica linee aeree</p>
+</header>
+
+<main class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="showModule('reglage',this)">Reglage</button>
+    <button class="tab" onclick="showModule('verifica_reglage',this)">Verifica Reglage</button>
+    <button class="tab" onclick="showModule('papoto',this)">Papoto</button>
+    <button class="tab" onclick="showModule('pilone',this)">Pilone</button>
+    <button class="tab" onclick="showModule('esterno',this)">Esterno</button>
+    <button class="tab" onclick="showModule('interno',this)">Interno</button>
+  </div>
+
+  <section id="reglage" class="module active card">
+    <h2>Reglage conduttore</h2>
+    <div class="note">Inserimento angoli attacchi sempre da <b>Sostegno Sinistro → Sostegno Destro</b>.</div>
+    <div class="grid">
+      <div class="grid">
+      <div class="row"><label>Sostegno sinistro N°</label><input id="reg_palo_sx" placeholder="Es. 16" inputmode="text"></div>
+      <div class="row"><label>Sostegno destro N°</label><input id="reg_palo_dx" placeholder="Es. 17" inputmode="text"></div>
+    </div>
+    <div class="row"><label>Campata (m)</label><input id="reg_campata" inputmode="decimal"></div>
+      <div class="row"><label>Dislivello attacchi (m)</label><input id="reg_dislivello" inputmode="decimal" placeholder="Es. + oppure -"></div>
+    </div>
+    <div class="small" style="margin:-4px 0 12px">Il segno serve come promemoria operativo; per Freccia ↔ Parametro viene usato il valore assoluto.</div>
+    <div class="grid">
+      <div class="row"><label>Sostegno di riferimento distanza</label><select id="reg_sostegno"><option value="sx">Sostegno sinistro</option><option value="dx">Sostegno destro</option></select></div>
+      <div class="row"><label>Distanza dal sostegno selezionato (m)</label><input id="reg_distanza" inputmode="decimal"></div>
+    </div>
+    <div class="grid">
+      <div class="row"><label>Tipo di dato noto</label><select id="reg_tipo" onchange="updateDatoNotoLabel()"><option value="freccia">Freccia</option><option value="parametro">Parametro</option></select></div>
+      <div class="row"><label id="reg_dato_label">Freccia (m)</label><input id="reg_dato" inputmode="decimal" placeholder="Inserisci freccia"></div>
+    </div>
+    <div class="row"><label>Temperatura al momento della rilevazione (°C)</label><input id="reg_temp" inputmode="decimal"></div>
+    <div id="reg_conv" class="result">
+      <b>Conversione Freccia / Parametro:</b><br>
+      Dislivello inserito: -- m<br>
+      Dislivello usato in formula: -- m<br>
+      Freccia: -- m<br>
+      Parametro: -- m
+    </div>
+    <div class="schema">[ATTACCO SX] ───────── conduttore ───────── [ATTACCO DX]</div>
+    <h3>Attacco sinistro</h3><div class="grid"><div class="row"><label>Orizzontale HG (gon)</label><input id="reg_hs" inputmode="decimal"></div><div class="row"><label>Verticale VG (gon)</label><input id="reg_vs" inputmode="decimal"></div></div>
+    <h3>Attacco destro</h3><div class="grid"><div class="row"><label>Orizzontale HD (gon)</label><input id="reg_hd" inputmode="decimal"></div><div class="row"><label>Verticale VD (gon)</label><input id="reg_vd" inputmode="decimal"></div></div>
+    <div class="actions">
+      <button onclick="calcReglage()">Calcola angolo tangente</button>
+      <button class="reset" onclick="resetModule('reglage')">Reset / cancella</button>
+    </div>
+    <div id="reg_result" class="result"><b>Risultato:</b><br>HTG: -- gon<br>VTG: -- gon</div>
+  </section>
+
+  
+  
+  
+  <section id="verifica_reglage" class="module card">
+    <h2>Verifica Reglage</h2>
+    <div class="note">
+      Programma inverso del Reglage: inserisci il punto tangente rilevato sul conduttore e ottieni la freccia rilevata.
+    </div>
+
+    <div class="grid">
+      <div class="row">
+        <label>Sostegno sinistro N°</label>
+        <input id="vr_palo_sx" placeholder="Es. 16" inputmode="text">
+      </div>
+      <div class="row">
+        <label>Sostegno destro N°</label>
+        <input id="vr_palo_dx" placeholder="Es. 17" inputmode="text">
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="row">
+        <label>Campata (m)</label>
+        <input id="vr_campata" inputmode="decimal">
+      </div>
+      <div class="row">
+        <label>Dislivello attacchi (m)</label>
+        <input id="vr_dislivello" inputmode="decimal" placeholder="+ oppure -">
+      </div>
+    </div>
+    <div class="small" style="margin:-4px 0 12px">
+      Il dislivello può essere positivo o negativo; per il parametro viene usato il valore assoluto.
+    </div>
+
+    <div class="grid">
+      <div class="row">
+        <label>Sostegno di riferimento distanza</label>
+        <select id="vr_sostegno">
+          <option value="sx">Sostegno sinistro</option>
+          <option value="dx">Sostegno destro</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Distanza dal sostegno selezionato (m)</label>
+        <input id="vr_distanza" inputmode="decimal">
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="row">
+        <label>Freccia tabella (m) - facoltativa</label>
+        <input id="vr_f_tab" inputmode="decimal">
+      </div>
+      <div class="row">
+        <label>Temperatura rilevazione (°C)</label>
+        <input id="vr_temp" inputmode="decimal">
+      </div>
+    </div>
+
+    <div class="schema">[ATTACCO SX] ───────── conduttore ───────── [ATTACCO DX]</div>
+
+    <h3>Attacco sinistro</h3>
+    <div class="grid">
+      <div class="row">
+        <label>Orizzontale HG (gon)</label>
+        <input id="vr_hs" inputmode="decimal">
+      </div>
+      <div class="row">
+        <label>Verticale VG (gon)</label>
+        <input id="vr_vs" inputmode="decimal">
+      </div>
+    </div>
+
+    <h3>Attacco destro</h3>
+    <div class="grid">
+      <div class="row">
+        <label>Orizzontale HD (gon)</label>
+        <input id="vr_hd" inputmode="decimal">
+      </div>
+      <div class="row">
+        <label>Verticale VD (gon)</label>
+        <input id="vr_vd" inputmode="decimal">
+      </div>
+    </div>
+
+    <h3>Punto tangente rilevato</h3>
+    <div class="grid">
+      <div class="row">
+        <label>HTG rilevato (gon) - facoltativo</label>
+        <input id="vr_htg" inputmode="decimal">
+      </div>
+      <div class="row">
+        <label>VTG rilevato (gon)</label>
+        <input id="vr_vtg" inputmode="decimal">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button onclick="calcVerificaReglage()">Calcola freccia rilevata</button>
+      <button class="reset" onclick="resetModule('verifica_reglage')">Reset / cancella</button>
+    </div>
+
+    <div id="vr_result" class="result">
+      <b>Risultato Verifica Reglage:</b><br>
+      Freccia rilevata: -- m<br>
+      Parametro rilevato: -- m
+    </div>
+  </section>
+
+<section id="papoto" class="module card">
+    <h2>Papoto - Verifica freccia</h2>
+    <div class="note">
+      Inserire solo campata e angoli H/V dei cinque punti: attacco sinistro, centro-sinistra, centro, centro-destra, attacco destro.
+    </div>
+
+    <div class="row">
+      <label>Campata XY / identificativo campata</label>
+      <input id="pa_id" placeholder="Es. 10/11" inputmode="text">
+    </div>
+
+    <div class="grid">
+      <div class="row"><label>Campata (m)</label><input id="pa_campata" inputmode="decimal"></div>
+      <div class="row"><label>Freccia tabella (m) - facoltativa</label><input id="pa_f_tab" inputmode="decimal"></div>
+      <div class="row"><label>Dislivello attacchi (m)</label><input id="pa_dislivello" inputmode="decimal" placeholder="+ oppure -"></div>
+      <div class="row"><label>Temperatura rilevazione (°C)</label><input id="pa_temp" inputmode="decimal"></div>
+    </div>
+
+    <div class="schema">[ATTACCO SX] ─ [CENTRO SX] ─ [CENTRO] ─ [CENTRO DX] ─ [ATTACCO DX]</div>
+
+    <h3>Attacco sinistro</h3>
+    <div class="grid">
+      <div class="row"><label>HSX - Orizzontale attacco sinistro (gon)</label><input id="pa_hsx" inputmode="decimal"></div>
+      <div class="row"><label>VSX - Verticale attacco sinistro (gon)</label><input id="pa_vsx" inputmode="decimal"></div>
+    </div>
+
+    <h3>Centro-sinistra</h3>
+    <div class="grid">
+      <div class="row"><label>H1 (gon)</label><input id="pa_h1" inputmode="decimal"></div>
+      <div class="row"><label>V1 (gon)</label><input id="pa_v1" inputmode="decimal"></div>
+    </div>
+
+    <h3>Centro campata</h3>
+    <div class="grid">
+      <div class="row"><label>H2 (gon)</label><input id="pa_h2" inputmode="decimal"></div>
+      <div class="row"><label>V2 (gon)</label><input id="pa_v2" inputmode="decimal"></div>
+    </div>
+
+    <h3>Centro-destra</h3>
+    <div class="grid">
+      <div class="row"><label>H3 (gon)</label><input id="pa_h3" inputmode="decimal"></div>
+      <div class="row"><label>V3 (gon)</label><input id="pa_v3" inputmode="decimal"></div>
+    </div>
+
+    <h3>Attacco destro</h3>
+    <div class="grid">
+      <div class="row"><label>HDX - Orizzontale attacco destro (gon)</label><input id="pa_hdx" inputmode="decimal"></div>
+      <div class="row"><label>VDX - Verticale attacco destro (gon)</label><input id="pa_vdx" inputmode="decimal"></div>
+    </div>
+
+    <div class="actions">
+      <button onclick="calcPapoto()">Calcola freccia</button>
+      <button class="reset" onclick="resetModule('papoto')">Reset / cancella</button>
+    </div>
+
+    <div id="pa_result" class="result">
+      <b>Risultato Papoto:</b><br>
+      Freccia rilevata: -- m<br>
+      Scostamento: -- %
+    </div>
+  </section>
+
+<section id="pilone" class="module card">
+    <h2>Viste tangenti - Pilone</h2>
+    <div class="note">Posizione strumento sul sostegno. Si guarda lungo linea: il sostegno indicato è quello <b>di fronte / davanti</b>.</div>
+    <div class="grid">
+      <div class="row"><label>Strumento su palo N°</label><input placeholder="Es. 28H" inputmode="text"></div>
+      <div class="row"><label>Palo di fronte N°</label><input placeholder="Es. 285" inputmode="text"></div>
+    </div>
+    <div class="schema">[STRUMENTO SU PALO] ───────── [PALO DI FRONTE]</div>
+    <div class="small" style="margin-bottom:12px">Inserisci la freccia da tabella: il parametro viene calcolato automaticamente con il valore assoluto del dislivello.</div>
+    <div class="grid">
+      <div class="row"><label>Campata (m)</label><input id="py_campata" inputmode="decimal" oninput="updateParam('py')"></div>
+      <div class="row"><label>Altezza conduttore / attacco (m)</label><input id="py_h" inputmode="decimal"></div>
+      <div class="row"><label>Angolo verticale palo di fronte (gon)</label><input id="py_vfront" inputmode="decimal"></div>
+      <div class="row"><label>Freccia da tabella (m)</label><input class="calc-param" data-span="py" id="py_freccia" inputmode="decimal" oninput="updateParam('py')"></div>
+      <div class="row"><label>Dislivello attacchi (m)</label><input class="calc-param" data-span="py" id="py_dislivello" inputmode="decimal" placeholder="+ oppure -" oninput="updateParam('py')"></div>
+      <div class="row"><label>Parametro calcolato (m)</label><input id="py_parametro" inputmode="decimal"></div>
+      <div class="row"><label>Temperatura rilevazione (°C)</label><input inputmode="decimal"></div>
+    </div>
+    <div class="actions"><button onclick="calcPilone()">Calcola VTG</button><button class="reset" onclick="resetModule('pilone')">Reset / cancella</button></div>
+    <div id="py_result" class="result">VTG: -- gon</div>
+  </section>
+
+  <section id="esterno" class="module card">
+    <h2>Viste tangenti - Esterno</h2>
+    <div class="note">Posizione esterna alla campata, lungo linea. Usare <b>Palo 1 vicino</b> e <b>Palo 2 lontano</b>.</div>
+    <div class="grid">
+      <div class="row"><label>Palo 1 vicino N°</label><input placeholder="Es. 28H" inputmode="text"></div>
+      <div class="row"><label>Palo 2 lontano N°</label><input placeholder="Es. 285" inputmode="text"></div>
+    </div>
+    <div class="schema">[STRUMENTO] ─ distanza ─ [PALO 1 VICINO] ───────── [PALO 2 LONTANO]</div>
+    <div class="small" style="margin-bottom:12px">Inserisci la freccia da tabella: il parametro viene calcolato automaticamente con il valore assoluto del dislivello.</div>
+    <div class="grid">
+      <div class="row"><label>Campata (m)</label><input id="ex_campata" inputmode="decimal" oninput="updateParam('ex')"></div>
+      <div class="row"><label>Distanza dal palo 1 vicino (m)</label><input id="ex_dist" inputmode="decimal"></div>
+      <div class="row"><label>Angolo verticale palo 1 vicino (gon)</label><input id="ex_v1" inputmode="decimal"></div>
+      <div class="row"><label>Angolo verticale palo 2 lontano (gon)</label><input id="ex_v2" inputmode="decimal"></div>
+      <div class="row"><label>Freccia da tabella (m)</label><input id="ex_freccia" inputmode="decimal" oninput="updateParam('ex')"></div>
+      <div class="row"><label>Dislivello attacchi (m)</label><input id="ex_dislivello" inputmode="decimal" placeholder="+ oppure -" oninput="updateParam('ex')"></div>
+      <div class="row"><label>Parametro calcolato (m)</label><input id="ex_parametro" inputmode="decimal"></div>
+      <div class="row"><label>Temperatura rilevazione (°C)</label><input inputmode="decimal"></div>
+    </div>
+    <div class="actions"><button onclick="calcEsterno()">Calcola VTG</button><button class="reset" onclick="resetModule('esterno')">Reset / cancella</button></div>
+    <div id="ex_result" class="result">VTG: -- gon</div>
+  </section>
+
+  <section id="interno" class="module card">
+    <h2>Viste tangenti - Interno</h2>
+    <div class="note">Posizione centrale nella campata rilevata, lungo linea. Usare <b>Palo 1 dietro</b> e <b>Palo 2 avanti</b>.</div>
+    <div class="grid">
+      <div class="row"><label>Palo 1 dietro N°</label><input placeholder="Es. 28H" inputmode="text"></div>
+      <div class="row"><label>Palo 2 avanti N°</label><input placeholder="Es. 285" inputmode="text"></div>
+    </div>
+    <div class="schema">[PALO 1 DIETRO] ───── [STRUMENTO] ───── [PALO 2 AVANTI]</div>
+    <div class="small" style="margin-bottom:12px">Inserisci la freccia da tabella: il parametro viene calcolato automaticamente con il valore assoluto del dislivello.</div>
+    <div class="grid">
+      <div class="row"><label>Campata (m)</label><input id="in_campata" inputmode="decimal" oninput="updateParam('in')"></div>
+      <div class="row"><label>Distanza dal palo 1 dietro (m)</label><input id="in_dist" inputmode="decimal"></div>
+      <div class="row"><label>Angolo verticale palo 1 dietro (gon)</label><input id="in_v1" inputmode="decimal"></div>
+      <div class="row"><label>Angolo verticale palo 2 avanti (gon)</label><input id="in_v2" inputmode="decimal"></div>
+      <div class="row"><label>Freccia da tabella (m)</label><input id="in_freccia" inputmode="decimal" oninput="updateParam('in')"></div>
+      <div class="row"><label>Dislivello attacchi (m)</label><input id="in_dislivello" inputmode="decimal" placeholder="+ oppure -" oninput="updateParam('in')"></div>
+      <div class="row"><label>Parametro calcolato (m)</label><input id="in_parametro" inputmode="decimal"></div>
+      <div class="row"><label>Temperatura rilevazione (°C)</label><input inputmode="decimal"></div>
+    </div>
+    <div class="actions"><button onclick="calcInterno()">Calcola VTG</button><button class="reset" onclick="resetModule('interno')">Reset / cancella</button></div>
+    <div id="in_result" class="result">VTG: -- gon</div>
+  </section>
+</main>
+
+<script>
+function showModule(id, btn){document.querySelectorAll('.module').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active')}
+function val(id){const v=document.getElementById(id)?.value||"";const x=Number(v.replace(",","."));return Number.isFinite(x)?x:0}
+function alertCalcImpossibile(msg){
+  return "<div class='alertbox'>⚠️ Calcolo impossibile<br>" + msg + "</div>";
+}
+function alertAttenzione(msg){
+  return "<div class='alertbox soft'>⚠️ Attenzione<br>" + msg + "</div>";
+}
+function deltaGon(a,b){
+  let d = Math.abs(a-b);
+  while(d>400) d-=400;
+  if(d>200) d=400-d;
+  return Math.abs(d);
+}
+function avvisoVicino(nome, vtg, vref){
+  const d = deltaGon(vtg, vref);
+  if(d < 1.0){
+    return alertAttenzione("VTG troppo vicino a " + nome + ". Differenza: " + d.toFixed(3) + " gon. La catenaria è poco visibile da questa posizione.");
+  }
+  return "";
+}
+function gonToRad(g){return g*Math.PI/200}
+function radToGon(r){return r*200/Math.PI}
+function atanG(x){return radToGon(Math.atan(x))}
+function asinG(x){return radToGon(Math.asin(Math.max(-1,Math.min(1,x))))}
+function acosG(x){return radToGon(Math.acos(Math.max(-1,Math.min(1,x))))}
+function sinG(g){return Math.sin(gonToRad(g))}
+function cosG(g){return Math.cos(gonToRad(g))}
+function tanG(g){return Math.tan(gonToRad(g))}
+
+function updateParam(prefix){
+  const A = val(prefix + "_campata");
+  const F = val(prefix + "_freccia");
+  const H = Math.abs(val(prefix + "_dislivello"));
+  const out = document.getElementById(prefix + "_parametro");
+  if(!out) return;
+  if(!A || !F) return;
+  const corda = Math.sqrt(A*A + H*H);
+  const P = A * corda / (8 * F);
+  out.value = P.toFixed(2);
+}
+
+function updateDatoNotoLabel(){const tipo=document.getElementById("reg_tipo").value;const lab=document.getElementById("reg_dato_label");const inp=document.getElementById("reg_dato");if(tipo==="freccia"){lab.textContent="Freccia (m)";inp.placeholder="Inserisci freccia"}else{lab.textContent="Parametro (m)";inp.placeholder="Inserisci parametro"}}
+function calcReglage(){
+  const A=val("reg_campata"), R=val("reg_distanza"), dato=val("reg_dato");
+  const Hinput=val("reg_dislivello");
+  const Habs=Math.abs(Hinput);
+  const B=val("reg_hs"), D=val("reg_vs"), C=val("reg_hd"), E=val("reg_vd");
+  const ref=document.getElementById("reg_sostegno").value;
+  const tipo=document.getElementById("reg_tipo").value;
+  if(!A||!R||!dato){
+    document.getElementById("reg_result").innerHTML="<b>Errore:</b><br>Inserire campata, distanza e freccia/parametro.";
+    return;
+  }
+  if(R <= 0 || R >= A){
+    document.getElementById("reg_result").innerHTML=alertCalcImpossibile("La distanza dal sostegno selezionato deve essere minore della campata e maggiore di zero.");
+    return;
+  }
+
+  let J=C-B; 
+  if(J<0) J+=400;
+
+  let K,L,M,N;
+  if(ref==="sx"){
+    K=asinG(R*sinG(J)/A);
+    L=200-J-K;
+    M=sinG(L)/sinG(J)*A;
+    N=R;
+  }else{
+    L=asinG(R*sinG(J)/A);
+    K=200-J-L;
+    N=sinG(K)/sinG(J)*A;
+    M=R;
+  }
+
+  // Dislivello geometrico ricavato dagli angoli, usato per il calcolo HTG/VTG come nella ricostruzione Reglage.
+  const O=N*tanG(100-D);
+  const Q=M*tanG(100-E);
+  const dislivelloAngoli=Q-O;
+
+  // Dislivello attacchi inserito dall'operatore, usato per conversione Freccia/Parametro.
+  const corda=Math.sqrt(A*A+Habs*Habs);
+
+  let F, Pcalc;
+  if(tipo==="freccia"){
+    F=dato;
+    Pcalc=A*corda/(8*F);
+  }else{
+    Pcalc=dato;
+    F=A*corda/(8*Pcalc);
+  }
+
+  const X=A/2;
+  const S=Math.sqrt(X*X+N*N-2*X*N*cosG(L));
+  const U=acosG((N*N+S*S-X*X)/(N*S*2));
+  let HTG=B+U; 
+  if(HTG>400) HTG-=400;
+
+  const W=O+dislivelloAngoli/2-F;
+  const VTG=100-atanG(W/S);
+
+  document.getElementById("reg_conv").innerHTML=
+    "<b>Conversione Freccia / Parametro:</b><br>"+
+    "Dislivello inserito: "+Hinput.toFixed(3)+" m<br>"+
+    "Dislivello usato in formula: "+Habs.toFixed(3)+" m<br>"+
+    "Freccia: "+F.toFixed(3)+" m<br>"+
+    "Parametro: "+Pcalc.toFixed(2)+" m<br>"+
+    "<span class='small'>Formula: P = Campata × √(Campata² + |Dislivello|²) / (8 × Freccia)</span>";
+
+  document.getElementById("reg_result").innerHTML=
+    "<b>Risultato:</b><br>"+
+    "HTG: "+HTG.toFixed(3)+" gon<br>"+
+    "VTG: "+VTG.toFixed(3)+" gon<br>"+
+    "<span class='small'>Reglage con dislivello attacchi inseribile.</span>";
+}
+function resetModule(id){
+  const root=document.getElementById(id);
+  root.querySelectorAll("input").forEach(i=>i.value="");
+  root.querySelectorAll("select").forEach(s=>s.selectedIndex=0);
+  if(id==="reglage"){
+    updateDatoNotoLabel();
+    document.getElementById("reg_result").innerHTML="<b>Risultato:</b><br>HTG: -- gon<br>VTG: -- gon";
+    document.getElementById("reg_conv").innerHTML="<b>Conversione Freccia / Parametro:</b><br>Dislivello inserito: -- m<br>Dislivello usato in formula: -- m<br>Freccia: -- m<br>Parametro: -- m";
+  }
+  if(id==="papoto")document.getElementById("pa_result").innerHTML="<b>Risultato Papoto:</b><br>Freccia rilevata: -- m<br>Scostamento: -- %";
+  if(id==="verifica_reglage")document.getElementById("vr_result").innerHTML="<b>Risultato Verifica Reglage:</b><br>Freccia rilevata: -- m<br>Parametro rilevato: -- m";
+  if(id==="pilone")document.getElementById("py_result").innerHTML="VTG: -- gon";
+  if(id==="esterno")document.getElementById("ex_result").innerHTML="VTG: -- gon";
+  if(id==="interno")document.getElementById("in_result").innerHTML="VTG: -- gon";
+}
+
+
+function calcPilone(){
+  const A = val("py_campata");
+  const B = val("py_h");
+  const E = val("py_vfront");
+  const P = val("py_parametro");
+  const out = document.getElementById("py_result");
+
+  if(!A || !P){
+    out.innerHTML = "<b>Errore:</b><br>Inserire campata e parametro, oppure freccia per calcolarlo.";
+    return;
+  }
+
+  if(E===0 || E===200 || E===-200 || E===400){
+    out.innerHTML = "<b>Errore:</b><br>Angolo verticale non valido per il calcolo.";
+    return;
+  }
+
+  // Ricostruzione del programma Casio "Visees - Pilone" con sottoprogramma Vis1.
+  // M = dislivello tra attacco davanti e conduttore presso strumento.
+  const M = A * tanG(100 - E) - B;
+  const den = 2 * P * Math.sinh(A / (2 * P));
+  if(den === 0){
+    out.innerHTML = "<b>Errore:</b><br>Divisione per zero.";
+    return;
+  }
+
+  // O corrisponde al riferimento orizzontale della catenaria nel listato Casio.
+  let O = P * Math.asinh(M / den) - A / 2;
+  const Q = P * Math.cosh(O / P) - B;
+
+  function Ffun(r){
+    return Math.sinh(r / P) - (P * Math.cosh(r / P) - Q) / (r - O);
+  }
+
+  let root = null;
+  let last = O + 0.001;
+  let lastF = Ffun(last);
+  const steps = 1500;
+
+  for(let i=1; i<=steps; i++){
+    const r = O + A * i / steps;
+    const fr = Ffun(r);
+    if(Number.isFinite(lastF) && Number.isFinite(fr) && lastF * fr <= 0){
+      let lo = last, hi = r, flo = lastF;
+      for(let j=0; j<80; j++){
+        const mid = (lo + hi) / 2;
+        const fm = Ffun(mid);
+        if(flo * fm <= 0){ hi = mid; }
+        else { lo = mid; flo = fm; }
+      }
+      root = (lo + hi) / 2;
+      break;
+    }
+    last = r;
+    lastF = fr;
+  }
+
+  if(root === null){
+    out.innerHTML = "<b>Calcolo non riuscito:</b><br>verifica campata, H, V e parametro.";
+    return;
+  }
+
+  const N = Math.sinh(root / P);
+  const VTG = 100 - atanG(N);
+
+  out.innerHTML =
+    "<b>Risultato Pilone:</b><br>" +
+    "VTG: " + VTG.toFixed(3) + " gon<br>" +
+    avvisoVicino("angolo verticale palo di fronte", VTG, E) +
+    "<span class='small'>Formula Pilone aggiornata dal sottoprogramma Casio Vis1.</span>";
+}
+
+
+function vis1Calc(A, B, K, M, P){
+  const den = 2 * P * Math.sinh(A / (2 * P));
+  if(den === 0) return null;
+
+  let O0 = P * Math.asinh(M / den) - A / 2;
+  const Q = P * Math.cosh(O0 / P) - B;
+  const O = O0 + K;
+
+  function Ffun(r){
+    return Math.sinh(r / P) - (P * Math.cosh(r / P) - Q) / (r - O);
+  }
+
+  let root = null;
+  let start = O - K + A / 2;
+  let minR = O - K;
+  let maxR = O - K + A;
+
+  // Try from the Casio starting point toward both sides, then full interval.
+  let samples = [];
+  for(let i=0;i<=1600;i++){
+    samples.push(minR + (maxR-minR)*i/1600);
+  }
+
+  let last = samples[0];
+  let lastF = Ffun(last);
+  for(let i=1;i<samples.length;i++){
+    const r = samples[i];
+    const fr = Ffun(r);
+    if(Number.isFinite(lastF) && Number.isFinite(fr) && lastF * fr <= 0){
+      let lo = last, hi = r, flo = lastF;
+      for(let j=0;j<80;j++){
+        const mid = (lo + hi) / 2;
+        const fm = Ffun(mid);
+        if(flo * fm <= 0){ hi = mid; }
+        else { lo = mid; flo = fm; }
+      }
+      root = (lo + hi) / 2;
+      break;
+    }
+    last = r;
+    lastF = fr;
+  }
+
+  if(root === null) return null;
+  const N = Math.sinh(root / P);
+  return {N, VTG: 100 - atanG(N)};
+}
+
+function calcEsterno(){
+  const A = val("ex_campata");
+  const C = val("ex_dist");
+  const D = val("ex_v1");
+  const E = val("ex_v2");
+  const P = val("ex_parametro");
+  const out = document.getElementById("ex_result");
+
+  if(!A || !C || !P){
+    out.innerHTML = "<b>Errore:</b><br>Inserire campata, distanza e parametro, oppure freccia per calcolarlo.";
+    return;
+  }
+
+  if(D===0 || D===200 || D===-200 || D===400 || E===0 || E===200 || E===-200 || E===400){
+    out.innerHTML = "<b>Errore:</b><br>Angolo verticale non valido per il calcolo.";
+    return;
+  }
+
+  // Esterno: strumento fuori campata, distanza riferita al palo 1 vicino.
+  const K = -C;
+  const B = C * tanG(100 - D);
+  const M = (A - K) * tanG(100 - E) - B;
+
+  const r = vis1Calc(A, B, K, M, P);
+  if(!r){
+    out.innerHTML = "<b>Calcolo non riuscito:</b><br>verifica campata, distanza, V1, V2 e parametro.";
+    return;
+  }
+
+  out.innerHTML =
+    "<b>Risultato Esterno:</b><br>" +
+    "VTG: " + r.VTG.toFixed(3) + " gon<br>" +
+    avvisoVicino("angolo verticale palo 2 lontano", r.VTG, E) +
+    "<span class='small'>Calcolo ricostruito dal programma Casio Visees - Esterno.</span>";
+}
+
+
+
+
+function calcInterno(){
+  const A = val("in_campata");
+  const C = val("in_dist");
+  const D = val("in_v1");
+  const E = val("in_v2");
+  const P = val("in_parametro");
+  const out = document.getElementById("in_result");
+
+  if(!A || !C || !P){
+    out.innerHTML = "<b>Errore:</b><br>Inserire campata, distanza e parametro, oppure freccia per calcolarlo.";
+    return;
+  }
+
+  if(D===0 || D===200 || D===-200 || D===400 || E===0 || E===200 || E===-200 || E===400){
+    out.innerHTML = "<b>Errore:</b><br>Angolo verticale non valido per il calcolo.";
+    return;
+  }
+
+  // Interno: strumento dentro la campata.
+  // Distanza C riferita al palo 1 dietro.
+  const K = C;
+  const B = C * tanG(100 - D);
+  const M = (A - K) * tanG(100 - E) - B;
+
+  const den = 2 * P * Math.sinh(A / (2 * P));
+  if(den === 0){
+    out.innerHTML = "<b>Errore:</b><br>Divisione per zero.";
+    return;
+  }
+
+  const O0 = P * Math.asinh(M / den) - A / 2;
+  const Q = P * Math.cosh(O0 / P) - B;
+  const O = O0 + K;
+
+  function Ffun(r){
+    if(Math.abs(r - O) < 1e-7) return null;
+    return Math.sinh(r / P) - (P * Math.cosh(r / P) - Q) / (r - O);
+  }
+
+  let roots = [];
+  const minR = O0;
+  const maxR = O0 + A;
+  let last = null;
+  let lastF = null;
+
+  for(let i=0; i<=4000; i++){
+    const r = minR + (maxR - minR) * i / 4000;
+    const fr = Ffun(r);
+    if(fr === null || !Number.isFinite(fr)) continue;
+
+    if(lastF !== null && lastF * fr <= 0){
+      let lo = last, hi = r, flo = lastF;
+      for(let j=0; j<80; j++){
+        const mid = (lo + hi) / 2;
+        const fm = Ffun(mid);
+        if(fm === null || !Number.isFinite(fm)){
+          lo = mid;
+          continue;
+        }
+        if(flo * fm <= 0){
+          hi = mid;
+        }else{
+          lo = mid;
+          flo = fm;
+        }
+      }
+      const root = (lo + hi) / 2;
+      if(Math.abs(root - O) > 0.01 && (roots.length === 0 || Math.abs(root - roots[roots.length - 1]) > 0.001)){
+        roots.push(root);
+      }
+    }
+
+    last = r;
+    lastF = fr;
+  }
+
+  if(roots.length === 0){
+    out.innerHTML = "<b>Calcolo non riuscito:</b><br>verifica campata, distanza, V1, V2 e parametro.";
+    return;
+  }
+
+  // Se lo strumento è nella prima metà campata, si usa il ramo verso il palo avanti.
+  // Se è nella seconda metà campata, si usa il ramo verso il palo dietro.
+  let candidates;
+  if(C <= A / 2){
+    candidates = roots.filter(r => r > O);
+    if(candidates.length === 0) candidates = roots;
+    candidates.sort((a,b)=>a-b);
+  }else{
+    candidates = roots.filter(r => r < O);
+    if(candidates.length === 0) candidates = roots;
+    candidates.sort((a,b)=>b-a);
+  }
+
+  const root = candidates[0];
+  const N = Math.sinh(root / P);
+  const VTG = 100 - atanG(N);
+
+  out.innerHTML =
+    "<b>Risultato Interno:</b><br>" +
+    "VTG: " + VTG.toFixed(3) + " gon<br>" +
+    avvisoVicino("angolo verticale palo 2 avanti", VTG, E) +
+    "<span class='small'>Calcolo Interno aggiornato: ramo scelto in base alla posizione dello strumento nella campata.</span>";
+}
+
+
+
+
+function calcVerificaReglage(){
+  const A=val("vr_campata"), R=val("vr_distanza"), Hinput=val("vr_dislivello");
+  const Habs=Math.abs(Hinput);
+  const B=val("vr_hs"), D=val("vr_vs"), C=val("vr_hd"), E=val("vr_vd");
+  const VTG=val("vr_vtg");
+  const HTGmis=val("vr_htg");
+  const ftab=val("vr_f_tab");
+  const ref=document.getElementById("vr_sostegno").value;
+  const out=document.getElementById("vr_result");
+
+  if(!A||!R||!VTG){
+    out.innerHTML="<b>Errore:</b><br>Inserire campata, distanza e VTG rilevato.";
+    return;
+  }
+  if(R <= 0 || R >= A){
+    out.innerHTML=alertCalcImpossibile("La distanza dal sostegno selezionato deve essere minore della campata e maggiore di zero.");
+    return;
+  }
+
+  let J=C-B; 
+  if(J<0) J+=400;
+
+  let K,L,M,N;
+  if(ref==="sx"){
+    K=asinG(R*sinG(J)/A);
+    L=200-J-K;
+    M=sinG(L)/sinG(J)*A;
+    N=R;
+  }else{
+    L=asinG(R*sinG(J)/A);
+    K=200-J-L;
+    N=sinG(K)/sinG(J)*A;
+    M=R;
+  }
+
+  const O=N*tanG(100-D);
+  const Q=M*tanG(100-E);
+  const dislivelloAngoli=Q-O;
+
+  const X=A/2;
+  const S=Math.sqrt(X*X+N*N-2*X*N*cosG(L));
+  const U=acosG((N*N+S*S-X*X)/(N*S*2));
+  let HTGcalc=B+U;
+  if(HTGcalc>400) HTGcalc-=400;
+
+  // Inversione diretta del Reglage:
+  // VTG = 100 - atan((O + dislivelloAngoli/2 - Freccia) / S)
+  const F = O + dislivelloAngoli/2 - S * tanG(100 - VTG);
+  const corda=Math.sqrt(A*A+Habs*Habs);
+  const P = A * corda / (8 * F);
+
+  let scost="";
+  if(ftab){
+    const pct=(F-ftab)/ftab*100;
+    scost="Freccia tabella: "+ftab.toFixed(3)+" m<br>"+
+          "Scostamento: "+pct.toFixed(2)+" %<br>";
+  }
+
+  let controllo="";
+  if(HTGmis){
+    let diff=HTGmis-HTGcalc;
+    if(diff>200) diff-=400;
+    if(diff<-200) diff+=400;
+    controllo="HTG teorico: "+HTGcalc.toFixed(3)+" gon<br>"+
+              "Differenza HTG rilevato-teorico: "+diff.toFixed(3)+" gon<br>";
+  }else{
+    controllo="HTG teorico: "+HTGcalc.toFixed(3)+" gon<br>";
+  }
+
+  out.innerHTML=
+    "<b>Risultato Verifica Reglage:</b><br>"+
+    "Freccia rilevata: "+F.toFixed(3)+" m<br>"+
+    "Parametro rilevato: "+P.toFixed(2)+" m<br>"+
+    scost+
+    controllo+
+    "<span class='small'>Calcolo inverso ricavato dal Reglage validato.</span>";
+}
+
+function cosh(x){ return (Math.exp(x) + Math.exp(-x)) / 2; }
+function sinh(x){ return (Math.exp(x) - Math.exp(-x)) / 2; }
+
+function papotoCore(hgr, vgr, h1r, v1r, h2r, v2r, hdr, vdr, a){
+  const pi = Math.PI;
+  let alpha = (pi - hdr + hgr) / 2;
+  let iteralpha = (pi - hdr + hgr) / 4;
+  let param = 1000;
+  let fd = 1;
+  let i = 1;
+  let x0 = a / 2;
+
+  while(Math.abs(iteralpha) > 0.00000157){
+    const ag = a * Math.sin(pi - hdr - alpha) / Math.sin(hdr);
+    const ad = a * Math.sin(alpha) / Math.sin(hdr);
+    const yd = ad * Math.tan(vdr) - ag * Math.tan(vgr);
+
+    const x1 = ag * Math.sin(h1r) / Math.sin(pi - h1r - alpha);
+    const a1 = x1 * Math.sin(alpha) / Math.sin(h1r);
+    const y1 = a1 * Math.tan(v1r) - ag * Math.tan(vgr);
+
+    const x2 = ag * Math.sin(h2r) / Math.sin(pi - h2r - alpha);
+    const a2 = x2 * Math.sin(alpha) / Math.sin(h2r);
+    const y2 = a2 * Math.tan(v2r) - ag * Math.tan(vgr);
+
+    let f1 = 1;
+    let j = 1;
+
+    while(Math.abs(f1) > 0.005){
+      x0 = a / 2;
+      fd = 1;
+      let k = 1;
+
+      while(Math.abs(fd) > 0.05){
+        fd = param * (cosh((a - x0) / param) - cosh(x0 / param)) - yd;
+        const fdev = -sinh((a - x0) / param) - sinh(x0 / param);
+        if(!Number.isFinite(fd) || !Number.isFinite(fdev) || Math.abs(fdev) < 1e-12){
+          return {param:0, fd:fd};
+        }
+        x0 = x0 - fd / fdev;
+
+        if(k === 15){
+          param = 0;
+          return {param:0, fd:fd};
+        }
+        k += 1;
+      }
+
+      f1 = param * (cosh((x1 - x0) / param) - cosh(x0 / param)) - y1;
+      const denom = (y1 - yd * x1 / a);
+      if(Math.abs(denom) < 1e-12){
+        return {param:0, fd:fd};
+      }
+      param = param * (param * (cosh((x1 - x0) / param) - cosh(x0 / param)) - yd * x1 / a) / denom;
+
+      if(!Number.isFinite(param) || param <= 0){
+        return {param:0, fd:fd};
+      }
+
+      if(j === 15){
+        param = 0;
+        return {param:0, fd:fd};
+      }
+      j += 1;
+    }
+
+    const f2 = param * (cosh((x2 - x0) / param) - cosh(x0 / param)) - y2;
+
+    if(f2 > 0){
+      alpha = alpha + iteralpha;
+    }else{
+      alpha = alpha - iteralpha;
+    }
+
+    if(i === 20){
+      param = 0;
+      return {param:0, fd:fd};
+    }
+
+    iteralpha = iteralpha / 2;
+    i += 1;
+  }
+
+  return {param:param, fd:fd};
+}
+
+function relH(h, hg){
+  if(h < hg) return Math.PI / 200 * (400 + h - hg);
+  return Math.PI / 200 * (h - hg);
+}
+
+function vRad(v){
+  return Math.PI / 2 - Math.PI / 200 * v;
+}
+
+function calcPapoto(){
+  const a = val("pa_campata");
+  const ftab = val("pa_f_tab");
+  const disl = Math.abs(val("pa_dislivello"));
+
+  const hg = val("pa_hsx"), vg = val("pa_vsx");
+  const h1 = val("pa_h1"), v1 = val("pa_v1");
+  const h2 = val("pa_h2"), v2 = val("pa_v2");
+  const h3 = val("pa_h3"), v3 = val("pa_v3");
+  const hd = val("pa_hdx"), vd = val("pa_vdx");
+
+  const out = document.getElementById("pa_result");
+
+  if(!a || !hg || !hd){
+    out.innerHTML = "<b>Errore:</b><br>Inserire campata e tutti gli angoli H/V.";
+    return;
+  }
+
+  const hgr = 0;
+  const vgr = vRad(vg);
+  const hdr = relH(hd, hg);
+  const vdr = vRad(vd);
+
+  const h1r = relH(h1, hg);
+  const v1r = vRad(v1);
+
+  const h2r_12 = relH(h2, hg);
+  const v2r_12 = vRad(v2);
+
+  const h3r = relH(h3, hg);
+  const v3r = vRad(v3);
+
+  const p12 = papotoCore(hgr, vgr, h1r, v1r, h2r_12, v2r_12, hdr, vdr, a).param;
+  const p13 = papotoCore(hgr, vgr, h1r, v1r, h3r, v3r, hdr, vdr, a).param;
+  const p23 = papotoCore(hgr, vgr, h2r_12, v2r_12, h3r, v3r, hdr, vdr, a).param;
+
+  if(!p12 || !p13 || !p23){
+    out.innerHTML =
+      "<b>Calcolo Papoto non riuscito:</b><br>" +
+      "Uno dei parametri risulta nullo. Verifica gli angoli inseriti.";
+    return;
+  }
+
+  const media = (p12 + p13 + p23) / 3;
+  const corda = Math.sqrt(a*a + disl*disl);
+
+  const f12 = a * corda / (8 * p12);
+  const f23 = a * corda / (8 * p23);
+  const f13 = a * corda / (8 * p13);
+  const fRil = a * corda / (8 * media);
+
+  const ecartType = Math.sqrt((3 * (p12*p12 + p23*p23 + p13*p13) - Math.pow(p12+p23+p13,2)) / (3 * (3 - 1)));
+
+  let scost = "";
+  if(ftab){
+    const pct = (fRil - ftab) / ftab * 100;
+    scost = "Freccia tabella: " + ftab.toFixed(3) + " m<br>" +
+             "Scostamento: " + pct.toFixed(2) + " %<br>";
+  }else{
+    scost = "Scostamento: -- %<br>";
+  }
+
+  let avviso = "";
+  if(ecartType > 1000){
+    avviso = "<br><b>Attenzione:</b> Papoto erroné - scarto parametri troppo alto.<br>";
+  }
+
+  out.innerHTML =
+    "<b>Risultato Papoto:</b><br>" +
+    "Parametro 1-2: " + p12.toFixed(2) + " → Freccia " + f12.toFixed(3) + " m<br>" +
+    "Parametro 2-3: " + p23.toFixed(2) + " → Freccia " + f23.toFixed(3) + " m<br>" +
+    "Parametro 1-3: " + p13.toFixed(2) + " → Freccia " + f13.toFixed(3) + " m<br>" +
+    "<br><b>Parametro medio:</b> " + media.toFixed(2) + "<br>" +
+    "<b>Freccia rilevata:</b> " + fRil.toFixed(3) + " m<br>" +
+    scost +
+    "Scarto parametri: " + ecartType.toFixed(2) +
+    avviso +
+    "<br><span class='small'>Calcolo ricostruito dalla macro Excel Papoto originale.</span>";
+}
+
+function calcDemo(id){document.getElementById(id).innerHTML="Angolo tangente: -- gon<br><span class='small'>Campi pronti; formula da validare con risultati Casio.</span>"}
+updateDatoNotoLabel();
+</script>
+</body>
+</html>
