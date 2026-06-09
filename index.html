@@ -66,7 +66,25 @@ button.reset:hover{
 .module{display:none}.module.active{display:block}
 .schema{font-weight:700;text-align:center;background:#f8fafc;border:1px dashed #94a3b8;border-radius:12px;padding:10px;margin:10px 0}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr}}
+
+/* Archivio GeoLine Pro */
+.archive-actions button{padding:8px 10px;font-size:13px;border-radius:10px;margin:2px}
+.archive-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden}
+.archive-table th,.archive-table td{border:1px solid #dbe5f0;padding:8px;text-align:left;font-size:13px;vertical-align:top}
+.archive-table th{background:#eff6ff;color:#1e3a8a}
+.archive-box{display:none}
+@media(max-width:700px){.archive-table th,.archive-table td{font-size:12px;padding:6px}}
+
 </style>
+
+<link rel="manifest" href="./manifest.webmanifest?v=20260609">
+<meta name="theme-color" content="#083f75">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="GeoLine Pro">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="./favicon-32.png" sizes="32x32" type="image/png">
+
 </head>
 <body>
 <header class="header">
@@ -117,10 +135,25 @@ button.reset:hover{
     <h3>Attacco destro</h3><div class="grid"><div class="row"><label>Orizzontale HD (gon)</label><input id="reg_hd" inputmode="decimal"></div><div class="row"><label>Verticale VD (gon)</label><input id="reg_vd" inputmode="decimal"></div></div>
     <div class="actions">
       <button onclick="calcReglage()">Calcola angolo tangente</button>
+      <button type="button" onclick="salvaArchivioModulo('reglage')">Salva archivio</button>
+      <button class="reset" type="button" onclick="mostraArchivioModulo('reglage')">Archivio</button>
+
       <button class="reset" onclick="resetModule('reglage')">Reset / cancella</button>
     </div>
     <div id="reg_result" class="result"><b>Risultato:</b><br>HTG: -- gon<br>VTG: -- gon</div>
   </section>
+<section id="archivioBox_reglage" class="module card archive-box">
+  <h2>Archivio - Reglage</h2>
+  <div class="note">Archivio salvato nella memoria del browser. Usa “Esporta CSV” per conservarlo fuori dal dispositivo.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <button type="button" onclick="esportaArchivioCSV('reglage')">Esporta CSV</button>
+    <button class="reset" type="button" onclick="cancellaArchivioModulo('reglage')">Cancella archivio</button>
+    <button class="reset" type="button" onclick="mostraArchivioModulo('reglage')">Aggiorna lista</button>
+    <button class="reset" type="button" onclick="tornaModulo('reglage')">Torna al programma</button>
+  </div>
+  <div id="archivioLista_reglage" class="small"></div>
+</section>
+
 
   
   
@@ -221,6 +254,9 @@ button.reset:hover{
 
     <div class="actions">
       <button onclick="calcVerificaReglage()">Calcola freccia rilevata</button>
+      <button type="button" onclick="salvaArchivioModulo('verifica_reglage')">Salva archivio</button>
+      <button class="reset" type="button" onclick="mostraArchivioModulo('verifica_reglage')">Archivio</button>
+
       <button class="reset" onclick="resetModule('verifica_reglage')">Reset / cancella</button>
     </div>
 
@@ -230,6 +266,18 @@ button.reset:hover{
       Parametro rilevato: -- m
     </div>
   </section>
+<section id="archivioBox_verifica_reglage" class="module card archive-box">
+  <h2>Archivio - Verifica Reglage</h2>
+  <div class="note">Archivio salvato nella memoria del browser. Usa “Esporta CSV” per conservarlo fuori dal dispositivo.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <button type="button" onclick="esportaArchivioCSV('verifica_reglage')">Esporta CSV</button>
+    <button class="reset" type="button" onclick="cancellaArchivioModulo('verifica_reglage')">Cancella archivio</button>
+    <button class="reset" type="button" onclick="mostraArchivioModulo('verifica_reglage')">Aggiorna lista</button>
+    <button class="reset" type="button" onclick="tornaModulo('verifica_reglage')">Torna al programma</button>
+  </div>
+  <div id="archivioLista_verifica_reglage" class="small"></div>
+</section>
+
 
 <section id="papoto" class="module card">
     <h2>Papoto - Verifica freccia</h2>
@@ -283,6 +331,9 @@ button.reset:hover{
 
     <div class="actions">
       <button onclick="calcPapoto()">Calcola freccia</button>
+      <button type="button" onclick="salvaArchivioModulo('papoto')">Salva archivio</button>
+      <button class="reset" type="button" onclick="mostraArchivioModulo('papoto')">Archivio</button>
+
       <button class="reset" onclick="resetModule('papoto')">Reset / cancella</button>
     </div>
 
@@ -292,6 +343,18 @@ button.reset:hover{
       Scostamento: -- %
     </div>
   </section>
+<section id="archivioBox_papoto" class="module card archive-box">
+  <h2>Archivio - Papoto</h2>
+  <div class="note">Archivio salvato nella memoria del browser. Usa “Esporta CSV” per conservarlo fuori dal dispositivo.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <button type="button" onclick="esportaArchivioCSV('papoto')">Esporta CSV</button>
+    <button class="reset" type="button" onclick="cancellaArchivioModulo('papoto')">Cancella archivio</button>
+    <button class="reset" type="button" onclick="mostraArchivioModulo('papoto')">Aggiorna lista</button>
+    <button class="reset" type="button" onclick="tornaModulo('papoto')">Torna al programma</button>
+  </div>
+  <div id="archivioLista_papoto" class="small"></div>
+</section>
+
 
 <section id="pilone" class="module card">
     <h2>Viste tangenti - Pilone</h2>
@@ -311,9 +374,24 @@ button.reset:hover{
       <div class="row"><label>Parametro calcolato (m)</label><input id="py_parametro" inputmode="decimal"></div>
       <div class="row"><label>Temperatura rilevazione (°C)</label><input inputmode="decimal"></div>
     </div>
-    <div class="actions"><button onclick="calcPilone()">Calcola VTG</button><button class="reset" onclick="resetModule('pilone')">Reset / cancella</button></div>
+    <div class="actions"><button onclick="calcPilone()">Calcola VTG</button>
+      <button type="button" onclick="salvaArchivioModulo('pilone')">Salva archivio</button>
+      <button class="reset" type="button" onclick="mostraArchivioModulo('pilone')">Archivio</button>
+<button class="reset" onclick="resetModule('pilone')">Reset / cancella</button></div>
     <div id="py_result" class="result">VTG: -- gon</div>
   </section>
+<section id="archivioBox_pilone" class="module card archive-box">
+  <h2>Archivio - Pilone</h2>
+  <div class="note">Archivio salvato nella memoria del browser. Usa “Esporta CSV” per conservarlo fuori dal dispositivo.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <button type="button" onclick="esportaArchivioCSV('pilone')">Esporta CSV</button>
+    <button class="reset" type="button" onclick="cancellaArchivioModulo('pilone')">Cancella archivio</button>
+    <button class="reset" type="button" onclick="mostraArchivioModulo('pilone')">Aggiorna lista</button>
+    <button class="reset" type="button" onclick="tornaModulo('pilone')">Torna al programma</button>
+  </div>
+  <div id="archivioLista_pilone" class="small"></div>
+</section>
+
 
   <section id="esterno" class="module card">
     <h2>Viste tangenti - Esterno</h2>
@@ -334,9 +412,24 @@ button.reset:hover{
       <div class="row"><label>Parametro calcolato (m)</label><input id="ex_parametro" inputmode="decimal"></div>
       <div class="row"><label>Temperatura rilevazione (°C)</label><input inputmode="decimal"></div>
     </div>
-    <div class="actions"><button onclick="calcEsterno()">Calcola VTG</button><button class="reset" onclick="resetModule('esterno')">Reset / cancella</button></div>
+    <div class="actions"><button onclick="calcEsterno()">Calcola VTG</button>
+      <button type="button" onclick="salvaArchivioModulo('esterno')">Salva archivio</button>
+      <button class="reset" type="button" onclick="mostraArchivioModulo('esterno')">Archivio</button>
+<button class="reset" onclick="resetModule('esterno')">Reset / cancella</button></div>
     <div id="ex_result" class="result">VTG: -- gon</div>
   </section>
+<section id="archivioBox_esterno" class="module card archive-box">
+  <h2>Archivio - Esterno</h2>
+  <div class="note">Archivio salvato nella memoria del browser. Usa “Esporta CSV” per conservarlo fuori dal dispositivo.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <button type="button" onclick="esportaArchivioCSV('esterno')">Esporta CSV</button>
+    <button class="reset" type="button" onclick="cancellaArchivioModulo('esterno')">Cancella archivio</button>
+    <button class="reset" type="button" onclick="mostraArchivioModulo('esterno')">Aggiorna lista</button>
+    <button class="reset" type="button" onclick="tornaModulo('esterno')">Torna al programma</button>
+  </div>
+  <div id="archivioLista_esterno" class="small"></div>
+</section>
+
 
   <section id="interno" class="module card">
     <h2>Viste tangenti - Interno</h2>
@@ -357,9 +450,24 @@ button.reset:hover{
       <div class="row"><label>Parametro calcolato (m)</label><input id="in_parametro" inputmode="decimal"></div>
       <div class="row"><label>Temperatura rilevazione (°C)</label><input inputmode="decimal"></div>
     </div>
-    <div class="actions"><button onclick="calcInterno()">Calcola VTG</button><button class="reset" onclick="resetModule('interno')">Reset / cancella</button></div>
+    <div class="actions"><button onclick="calcInterno()">Calcola VTG</button>
+      <button type="button" onclick="salvaArchivioModulo('interno')">Salva archivio</button>
+      <button class="reset" type="button" onclick="mostraArchivioModulo('interno')">Archivio</button>
+<button class="reset" onclick="resetModule('interno')">Reset / cancella</button></div>
     <div id="in_result" class="result">VTG: -- gon</div>
   </section>
+<section id="archivioBox_interno" class="module card archive-box">
+  <h2>Archivio - Interno</h2>
+  <div class="note">Archivio salvato nella memoria del browser. Usa “Esporta CSV” per conservarlo fuori dal dispositivo.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <button type="button" onclick="esportaArchivioCSV('interno')">Esporta CSV</button>
+    <button class="reset" type="button" onclick="cancellaArchivioModulo('interno')">Cancella archivio</button>
+    <button class="reset" type="button" onclick="mostraArchivioModulo('interno')">Aggiorna lista</button>
+    <button class="reset" type="button" onclick="tornaModulo('interno')">Torna al programma</button>
+  </div>
+  <div id="archivioLista_interno" class="small"></div>
+</section>
+
 </main>
 
 <script>
@@ -1018,6 +1126,242 @@ function calcPapoto(){
 
 function calcDemo(id){document.getElementById(id).innerHTML="Angolo tangente: -- gon<br><span class='small'>Campi pronti; formula da validare con risultati Casio.</span>"}
 updateDatoNotoLabel();
+
+
+/* Archivio generale GeoLine Pro */
+const GEOLINE_ARCHIVIO_CONFIG = {
+  reglage: {
+    label: "Reglage",
+    resultId: "reg_result",
+    fields: ["reg_palo_sx","reg_palo_dx","reg_campata","reg_dislivello","reg_sostegno","reg_distanza","reg_tipo","reg_dato","reg_temp","reg_hs","reg_vs","reg_hd","reg_vd"],
+    calc: "calcReglage"
+  },
+  verifica_reglage: {
+    label: "Verifica Reglage",
+    resultId: "vr_result",
+    fields: ["vr_palo_sx","vr_palo_dx","vr_campata","vr_dislivello","vr_sostegno","vr_distanza","vr_f_tab","vr_temp","vr_hs","vr_vs","vr_hd","vr_vd","vr_htg","vr_vtg"],
+    calc: "calcVerificaReglage"
+  },
+  papoto: {
+    label: "Papoto",
+    resultId: "pa_result",
+    fields: ["pa_id","pa_campata","pa_f_tab","pa_dislivello","pa_temp","pa_hsx","pa_vsx","pa_h1","pa_v1","pa_h2","pa_v2","pa_h3","pa_v3","pa_hdx","pa_vdx"],
+    calc: "calcPapoto"
+  },
+  pilone: {
+    label: "Pilone",
+    resultId: "py_result",
+    fields: ["py_campata","py_h","py_vfront","py_freccia","py_dislivello","py_parametro"],
+    calc: "calcPilone"
+  },
+  esterno: {
+    label: "Esterno",
+    resultId: "ex_result",
+    fields: ["ex_campata","ex_dist","ex_v1","ex_v2","ex_freccia","ex_dislivello","ex_parametro"],
+    calc: "calcEsterno"
+  },
+  interno: {
+    label: "Interno",
+    resultId: "in_result",
+    fields: ["in_campata","in_dist","in_v1","in_v2","in_freccia","in_dislivello","in_parametro"],
+    calc: "calcInterno"
+  }
+};
+
+function archivioKeyModulo(modulo){
+  return "geoline_archivio_" + modulo;
+}
+
+function archivioGetModulo(modulo){
+  try { return JSON.parse(localStorage.getItem(archivioKeyModulo(modulo)) || "[]"); }
+  catch(e){ return []; }
+}
+
+function archivioSetModulo(modulo, dati){
+  localStorage.setItem(archivioKeyModulo(modulo), JSON.stringify(dati));
+}
+
+function leggiCampiModulo(modulo){
+  const cfg = GEOLINE_ARCHIVIO_CONFIG[modulo];
+  const out = {};
+  cfg.fields.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) out[id] = el.value || "";
+  });
+  return out;
+}
+
+function scriviCampiModulo(modulo, dati){
+  const cfg = GEOLINE_ARCHIVIO_CONFIG[modulo];
+  cfg.fields.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = dati[id] ?? "";
+  });
+  if(modulo === "reglage" && typeof updateDatoNotoLabel === "function") updateDatoNotoLabel();
+}
+
+function testoRisultatoModulo(modulo){
+  const cfg = GEOLINE_ARCHIVIO_CONFIG[modulo];
+  const el = document.getElementById(cfg.resultId);
+  return el ? el.innerText.replace(/\s+/g, " ").trim() : "";
+}
+
+function eseguiCalcoloModulo(modulo){
+  const cfg = GEOLINE_ARCHIVIO_CONFIG[modulo];
+  if(cfg && cfg.calc && typeof window[cfg.calc] === "function"){
+    window[cfg.calc]();
+  }
+}
+
+function salvaArchivioModulo(modulo){
+  const cfg = GEOLINE_ARCHIVIO_CONFIG[modulo];
+  if(!cfg) return;
+
+  eseguiCalcoloModulo(modulo);
+
+  const record = {
+    id: Date.now(),
+    dataOra: new Date().toLocaleString("it-IT"),
+    programma: cfg.label,
+    input: leggiCampiModulo(modulo),
+    risultato: testoRisultatoModulo(modulo)
+  };
+
+  const archivio = archivioGetModulo(modulo);
+  archivio.unshift(record);
+  archivioSetModulo(modulo, archivio);
+  mostraArchivioModulo(modulo);
+}
+
+function mostraArchivioModulo(modulo){
+  const cfg = GEOLINE_ARCHIVIO_CONFIG[modulo];
+  if(!cfg) return;
+
+  document.querySelectorAll(".module").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".archive-box").forEach(x => x.style.display = "none");
+
+  const box = document.getElementById("archivioBox_" + modulo);
+  const lista = document.getElementById("archivioLista_" + modulo);
+  if(!box || !lista) return;
+
+  box.style.display = "block";
+  box.classList.add("active");
+
+  const archivio = archivioGetModulo(modulo);
+  if(!archivio.length){
+    lista.innerHTML = "Nessuna prova salvata.";
+    return;
+  }
+
+  let html = "<table class='archive-table'><thead><tr><th>Data</th><th>Programma</th><th>Dati principali</th><th>Risultato</th><th>Azioni</th></tr></thead><tbody>";
+  archivio.forEach(r => {
+    const dati = Object.entries(r.input || {})
+      .filter(([k,v]) => v !== "" && v != null)
+      .slice(0, 8)
+      .map(([k,v]) => k.replace(/^reg_|^vr_|^pa_|^py_|^ex_|^in_/, "") + ": " + v)
+      .join("<br>");
+
+    html += "<tr>" +
+      "<td>" + escapeHtml(r.dataOra) + "</td>" +
+      "<td>" + escapeHtml(r.programma) + "</td>" +
+      "<td>" + escapeHtml(dati).replaceAll("&lt;br&gt;", "<br>") + "</td>" +
+      "<td>" + escapeHtml(r.risultato || "--") + "</td>" +
+      "<td class='archive-actions'>" +
+      "<button type='button' onclick=\"caricaArchivioModulo('" + modulo + "'," + r.id + ")\">Carica</button>" +
+      "<button class='reset' type='button' onclick=\"eliminaArchivioModulo('" + modulo + "'," + r.id + ")\">Elimina</button>" +
+      "</td>" +
+      "</tr>";
+  });
+  html += "</tbody></table>";
+  lista.innerHTML = html;
+}
+
+function caricaArchivioModulo(modulo, id){
+  const record = archivioGetModulo(modulo).find(x => x.id === id);
+  if(!record) return;
+  tornaModulo(modulo);
+  scriviCampiModulo(modulo, record.input || {});
+  eseguiCalcoloModulo(modulo);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function eliminaArchivioModulo(modulo, id){
+  archivioSetModulo(modulo, archivioGetModulo(modulo).filter(x => x.id !== id));
+  mostraArchivioModulo(modulo);
+}
+
+function cancellaArchivioModulo(modulo){
+  if(confirm("Cancellare tutto l'archivio di " + GEOLINE_ARCHIVIO_CONFIG[modulo].label + " salvato su questo browser?")){
+    localStorage.removeItem(archivioKeyModulo(modulo));
+    mostraArchivioModulo(modulo);
+  }
+}
+
+function tornaModulo(modulo){
+  document.querySelectorAll(".module").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".archive-box").forEach(x => x.style.display = "none");
+  const sec = document.getElementById(modulo);
+  if(sec) sec.classList.add("active");
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+  const btn = Array.from(document.querySelectorAll(".tab")).find(b => (b.getAttribute("onclick") || "").includes("'" + modulo + "'"));
+  if(btn) btn.classList.add("active");
+}
+
+function escapeHtml(v){
+  return String(v ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function csvEscapeArchivio(v){
+  if(v == null) return '""';
+  return '"' + String(v).replaceAll('"','""') + '"';
+}
+
+function esportaArchivioCSV(modulo){
+  const cfg = GEOLINE_ARCHIVIO_CONFIG[modulo];
+  const archivio = archivioGetModulo(modulo);
+  if(!archivio.length){
+    alert("Archivio vuoto.");
+    return;
+  }
+
+  const headers = ["dataOra", "programma", ...cfg.fields, "risultato"];
+  const rows = [headers.map(csvEscapeArchivio).join(";")];
+
+  archivio.forEach(r => {
+    const row = [
+      r.dataOra,
+      r.programma,
+      ...cfg.fields.map(id => (r.input || {})[id] || ""),
+      r.risultato || ""
+    ];
+    rows.push(row.map(csvEscapeArchivio).join(";"));
+  });
+
+  const blob = new Blob([rows.join("\n")], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "archivio_geoline_" + modulo + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 </script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js?v=20260609').catch(function(err){console.log(err);});
+  });
+}
+</script>
+
 </body>
 </html>
