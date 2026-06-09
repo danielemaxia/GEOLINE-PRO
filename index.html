@@ -75,6 +75,45 @@ button.reset:hover{
 .archive-box{display:none}
 @media(max-width:700px){.archive-table th,.archive-table td{font-size:12px;padding:6px}}
 
+
+/* Pulsante installazione app */
+.header-inner{
+  max-width:940px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.header-title{display:flex;align-items:center;gap:14px}
+.header-logo{
+  width:72px;
+  height:72px;
+  border-radius:18px;
+  object-fit:cover;
+  box-shadow:0 8px 24px rgba(0,0,0,.28);
+}
+.install-btn{
+  background:linear-gradient(135deg,#19a974,#087f5b);
+  color:#fff;
+  border:none;
+  padding:12px 18px;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 7px 18px rgba(8,127,91,.28);
+}
+.install-btn:disabled{
+  background:#6c757d;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+@media(max-width:700px){
+  .header-inner{align-items:flex-start;flex-direction:column}
+  .header-logo{width:64px;height:64px}
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest?v=20260609">
@@ -88,8 +127,16 @@ button.reset:hover{
 </head>
 <body>
 <header class="header">
-  <h1>GeoLine Pro</h1>
-  <p>Strumenti per regolazione e verifica linee aeree</p>
+  <div class="header-inner">
+    <div class="header-title">
+      <img src="./apple-touch-icon.png" alt="GeoLine Pro" class="header-logo">
+      <div>
+        <h1>GeoLine Pro</h1>
+        <p>Strumenti per regolazione e verifica linee aeree</p>
+      </div>
+    </div>
+    <button id="installAppBtn" class="install-btn" type="button">📲 Installa app</button>
+  </div>
 </header>
 
 <main class="wrap">
@@ -1353,6 +1400,85 @@ function esportaArchivioCSV(modulo){
   URL.revokeObjectURL(url);
 }
 
+</script>
+
+
+<script>
+let deferredInstallPrompt = null;
+
+function isRunningAsInstalledApp() {
+  return window.matchMedia('(display-mode: standalone)').matches ||
+         window.matchMedia('(display-mode: fullscreen)').matches ||
+         window.navigator.standalone === true;
+}
+
+function setInstallButtonState(state) {
+  const btn = document.getElementById('installAppBtn');
+  if (!btn) return;
+
+  btn.style.display = 'inline-block';
+
+  if (state === 'installed') {
+    btn.disabled = true;
+    btn.textContent = '✅ App installata';
+    btn.title = 'App già installata';
+    return;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '📲 Installa app';
+  btn.title = 'Installa GeoLine Pro';
+}
+
+window.addEventListener('beforeinstallprompt', function (event) {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  setInstallButtonState('ready');
+});
+
+window.addEventListener('appinstalled', function () {
+  deferredInstallPrompt = null;
+  setInstallButtonState('installed');
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const btn = document.getElementById('installAppBtn');
+  if (!btn) return;
+
+  if (isRunningAsInstalledApp()) {
+    setInstallButtonState('installed');
+  } else {
+    setInstallButtonState('ready');
+  }
+
+  btn.addEventListener('click', async function () {
+    if (isRunningAsInstalledApp()) {
+      setInstallButtonState('installed');
+      return;
+    }
+
+    if (!deferredInstallPrompt) {
+      alert('Se non parte subito: su PC/Android apri Chrome o Edge e usa menu ⋮ → Installa app. Su iPhone usa Safari → Condividi → Aggiungi alla schermata Home.');
+      return;
+    }
+
+    deferredInstallPrompt.prompt();
+
+    try {
+      const choice = await deferredInstallPrompt.userChoice;
+      if (choice && choice.outcome === 'accepted') {
+        setInstallButtonState('installed');
+      } else {
+        setInstallButtonState('ready');
+      }
+    } catch (err) {
+      console.log('Installazione annullata o non completata:', err);
+      setInstallButtonState('ready');
+    }
+
+    deferredInstallPrompt = null;
+  });
+});
 </script>
 
 <script>
