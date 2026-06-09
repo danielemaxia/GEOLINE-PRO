@@ -2,33 +2,23 @@
   "name": "GeoLine Pro",
   "short_name": "GeoLine Pro",
   "description": "Strumenti per regolazione e verifica linee aeree",
-  "id": "/GEOLINE-PRO/",
-  "start_url": "/GEOLINE-PRO/",
-  "scope": "/GEOLINE-PRO/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
   "orientation": "portrait",
   "background_color": "#083f75",
   "theme_color": "#083f75",
   "lang": "it-IT",
   "icons": [
     {
-      "src": "/GEOLINE-PRO/icon-192.jpg",
+      "src": "./icon-192.jpg",
       "sizes": "192x192",
       "type": "image/jpeg"
     },
     {
-      "src": "/GEOLINE-PRO/icon-512.jpg",
+      "src": "./icon-512.jpg",
       "sizes": "512x512",
       "type": "image/jpeg"
-    },
-    {
-      "src": "/GEOLINE-PRO/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
     }
   ]
 }
