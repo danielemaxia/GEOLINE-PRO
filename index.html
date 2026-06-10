@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GeoLine Pro</title>
+<title>GeoLine Pro v24</title>
 <style>
 :root{--blue:#0b5cab;--blue2:#083f75;--bg:#f3f6fa;--card:#fff;--text:#18212f;--muted:#64748b;--line:#d9e2ef}
 *{box-sizing:border-box}
@@ -16,6 +16,7 @@ h2{margin:0 0 12px;font-size:21px}h3{margin:18px 0 10px;font-size:16px;color:var
 label{font-weight:700;font-size:14px}
 input,select{width:100%;padding:12px;margin-top:6px;border:1px solid #cbd5e1;border-radius:12px;font-size:16px;background:#fff;transition:border-color .15s ease, box-shadow .15s ease}
 input:focus,select:focus{outline:none;border-color:#2f80ed;box-shadow:0 0 0 3px rgba(47,128,237,.14)}
+input[readonly]{background:#eef6ff;color:#003b73;font-weight:800;border-color:#7db7ff}
 button{
   background:linear-gradient(135deg,#2f80ed,#0b5cab);
   color:#fff;
@@ -226,7 +227,7 @@ button.reset:hover{
   <section id="verifica_reglage" class="module card">
     <h2>Verifica Reglage</h2>
     <div class="note">
-      Programma inverso del Reglage: inserisci il punto tangente rilevato sul conduttore e ottieni la freccia rilevata.
+      Programma inverso del Reglage: l’HTG teorico viene calcolato automaticamente. Impostalo sullo strumento, cerca il conduttore in verticale, inserisci il VTG e ottieni la freccia rilevata.
     </div>
 
     <div class="grid">
@@ -308,11 +309,11 @@ button.reset:hover{
     <h3>Punto tangente rilevato</h3>
     <div class="grid">
       <div class="row">
-        <label>HTG rilevato (gon) - facoltativo</label>
-        <input id="vr_htg" inputmode="decimal">
+        <label>HTG teorico da impostare (gon)</label>
+        <input id="vr_htg" inputmode="decimal" readonly placeholder="automatico">
       </div>
       <div class="row">
-        <label>VTG rilevato (gon)</label>
+        <label>VTG rilevato sul conduttore (gon)</label>
         <input id="vr_vtg" inputmode="decimal">
       </div>
     </div>
@@ -328,7 +329,8 @@ button.reset:hover{
     <div id="vr_result" class="result">
       <b>Risultato Verifica Reglage:</b><br>
       Freccia rilevata: -- m<br>
-      Parametro rilevato: -- m
+      Parametro rilevato: -- m<br>
+      HTG teorico: -- gon
     </div>
   </section>
 <section id="archivioBox_verifica_reglage" class="module card archive-box">
@@ -661,7 +663,7 @@ function resetModule(id){
     document.getElementById("reg_conv").innerHTML="<b>Conversione Freccia / Parametro:</b><br>Dislivello inserito: -- m<br>Dislivello usato in formula: -- m<br>Freccia: -- m<br>Parametro: -- m";
   }
   if(id==="papoto")document.getElementById("pa_result").innerHTML="<b>Risultato Papoto:</b><br>Freccia rilevata: -- m<br>Scostamento: -- %";
-  if(id==="verifica_reglage")document.getElementById("vr_result").innerHTML="<b>Risultato Verifica Reglage:</b><br>Freccia rilevata: -- m<br>Parametro rilevato: -- m";
+  if(id==="verifica_reglage"){document.getElementById("vr_result").innerHTML="<b>Risultato Verifica Reglage:</b><br>Freccia rilevata: -- m<br>Parametro rilevato: -- m"; aggiornaHTGVerificaReglage();}
   if(id==="pilone")document.getElementById("py_result").innerHTML="VTG: -- gon";
   if(id==="esterno")document.getElementById("ex_result").innerHTML="VTG: -- gon";
   if(id==="interno")document.getElementById("in_result").innerHTML="VTG: -- gon";
@@ -936,27 +938,18 @@ function calcInterno(){
 
 
 
-function calcVerificaReglage(){
-  const A=val("vr_campata"), R=val("vr_distanza"), Hinput=val("vr_dislivello");
-  const Habs=Math.abs(Hinput);
+
+function calcVerificaReglageGeom(){
+  const A=val("vr_campata"), R=val("vr_distanza");
   const B=val("vr_hs"), D=val("vr_vs"), C=val("vr_hd"), E=val("vr_vd");
-  const VTG=val("vr_vtg");
-  const HTGmis=val("vr_htg");
-  const ftab=val("vr_f_tab");
   const ref=document.getElementById("vr_sostegno").value;
-  const out=document.getElementById("vr_result");
 
-  if(!A||!R||!VTG){
-    out.innerHTML="<b>Errore:</b><br>Inserire campata, distanza e VTG rilevato.";
-    return;
-  }
-  if(R <= 0 || R >= A){
-    out.innerHTML=alertCalcImpossibile("La distanza dal sostegno selezionato deve essere minore della campata e maggiore di zero.");
-    return;
-  }
+  if(!A || !R || !C || !E) return null;
+  if(R <= 0 || R >= A) return null;
 
-  let J=C-B; 
+  let J=C-B;
   if(J<0) J+=400;
+  if(J<=0 || J>=200) return null;
 
   let K,L,M,N;
   if(ref==="sx"){
@@ -976,10 +969,81 @@ function calcVerificaReglage(){
   const dislivelloAngoli=Q-O;
 
   const X=A/2;
-  const S=Math.sqrt(X*X+N*N-2*X*N*cosG(L));
-  const U=acosG((N*N+S*S-X*X)/(N*S*2));
+  const S=Math.sqrt(Math.max(0, X*X+N*N-2*X*N*cosG(L)));
+  const den=N*S*2;
+  if(!den) return null;
+
+  const U=acosG((N*N+S*S-X*X)/den);
   let HTGcalc=B+U;
   if(HTGcalc>400) HTGcalc-=400;
+
+  return {A,R,B,D,C,E,ref,J,K,L,M,N,O,Q,dislivelloAngoli,X,S,U,HTGcalc};
+}
+
+function aggiornaHTGVerificaReglage(){
+  const g=calcVerificaReglageGeom();
+  const campo=document.getElementById("vr_htg");
+  if(!campo) return null;
+  campo.value = g ? g.HTGcalc.toFixed(3) : "";
+  return g;
+}
+
+function attivaHTGVerificaReglage(){
+  ["vr_campata","vr_distanza","vr_sostegno","vr_hs","vr_vs","vr_hd","vr_vd"].forEach(id=>{
+    const campo=document.getElementById(id);
+    if(campo){
+      campo.addEventListener("input", aggiornaHTGVerificaReglage);
+      campo.addEventListener("change", aggiornaHTGVerificaReglage);
+    }
+  });
+  aggiornaHTGVerificaReglage();
+}
+
+function attivaInvioCampoSuccessivo(){
+  document.addEventListener("keydown", function(e){
+    if(e.key !== "Enter") return;
+    const target=e.target;
+    if(!target || !target.matches("input, select")) return;
+
+    e.preventDefault();
+
+    const activeModule=document.querySelector(".module.active") || document;
+    const fields=Array.from(activeModule.querySelectorAll("input, select, button"))
+      .filter(el=>{
+        if(el.disabled) return false;
+        if(el.offsetParent === null) return false;
+        if(el.matches("input[readonly]")) return false;
+        return true;
+      });
+
+    const idx=fields.indexOf(target);
+    if(idx >= 0 && idx < fields.length-1){
+      fields[idx+1].focus();
+      if(fields[idx+1].select) fields[idx+1].select();
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  attivaHTGVerificaReglage();
+  attivaInvioCampoSuccessivo();
+});
+
+
+function calcVerificaReglage(){
+  const Hinput=val("vr_dislivello");
+  const Habs=Math.abs(Hinput);
+  const VTG=val("vr_vtg");
+  const ftab=val("vr_f_tab");
+  const out=document.getElementById("vr_result");
+  const g=aggiornaHTGVerificaReglage();
+
+  if(!g||!VTG){
+    out.innerHTML="<b>Errore:</b><br>Inserire campata, distanza, angoli degli attacchi e VTG rilevato.";
+    return;
+  }
+
+  const A=g.A, N=g.N, D=g.D, O=g.O, S=g.S, HTGcalc=g.HTGcalc, dislivelloAngoli=g.dislivelloAngoli;
 
   // Inversione diretta del Reglage:
   // VTG = 100 - atan((O + dislivelloAngoli/2 - Freccia) / S)
@@ -994,16 +1058,7 @@ function calcVerificaReglage(){
           "Scostamento: "+pct.toFixed(2)+" %<br>";
   }
 
-  let controllo="";
-  if(HTGmis){
-    let diff=HTGmis-HTGcalc;
-    if(diff>200) diff-=400;
-    if(diff<-200) diff+=400;
-    controllo="HTG teorico: "+HTGcalc.toFixed(3)+" gon<br>"+
-              "Differenza HTG rilevato-teorico: "+diff.toFixed(3)+" gon<br>";
-  }else{
-    controllo="HTG teorico: "+HTGcalc.toFixed(3)+" gon<br>";
-  }
+  let controllo="HTG teorico da impostare: "+HTGcalc.toFixed(3)+" gon<br>";
 
   out.innerHTML=
     "<b>Risultato Verifica Reglage:</b><br>"+
@@ -1263,6 +1318,7 @@ function scriviCampiModulo(modulo, dati){
     if(el) el.value = dati[id] ?? "";
   });
   if(modulo === "reglage" && typeof updateDatoNotoLabel === "function") updateDatoNotoLabel();
+  if(modulo === "verifica_reglage" && typeof aggiornaHTGVerificaReglage === "function") aggiornaHTGVerificaReglage();
 }
 
 function testoRisultatoModulo(modulo){
