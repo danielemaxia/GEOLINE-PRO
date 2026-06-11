@@ -1,4 +1,4 @@
-const CACHE_NAME = "geoline-pro-v2004";
+const CACHE_NAME = "geoline-pro-v2005";
 
 const urlsToCache = [
   "./",
