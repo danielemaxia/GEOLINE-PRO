@@ -11,14 +11,15 @@
   "lang": "it-IT",
   "icons": [
     {
-      "src": "./icon-192.jpg",
+      "src": "./icon-192.jpg?v=2004",
       "sizes": "192x192",
       "type": "image/jpeg"
     },
     {
-      "src": "./icon-512.jpg",
+      "src": "./icon-512.jpg?v=2004",
       "sizes": "512x512",
       "type": "image/jpeg"
     }
-  ]
+  ],
+  "version": "2004"
 }
