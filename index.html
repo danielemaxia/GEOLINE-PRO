@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GeoLine Pro v24</title>
-<!-- GeoLine Pro build v2005 -->
+<!-- GeoLine Pro build v2005 install-fix -->
 <style>
 :root{--blue:#0b5cab;--blue2:#083f75;--bg:#f3f6fa;--card:#fff;--text:#18212f;--muted:#64748b;--line:#d9e2ef}
 *{box-sizing:border-box}
@@ -126,7 +126,7 @@ button.reset:hover{
 
 
 
-<!-- PWA GeoLine Pro - configurazione manifest, icone e service worker -->
+<!-- PWA GeoLine Pro - configurazione manifest, icone e installazione app -->
 <link href="./manifest.webmanifest?v=2005" rel="manifest">
 <meta content="#083f75" name="theme-color">
 <meta content="yes" name="mobile-web-app-capable">
@@ -146,7 +146,7 @@ button.reset:hover{
 <header class="header">
   <div class="header-inner">
     <div class="header-title">
-      <img src="./apple-touch-icon.png?v=2005" alt="GeoLine Pro" class="header-logo">
+      <img src="./icon-512.png?v=2005" alt="GeoLine Pro" class="header-logo">
       <div>
         <h1>GeoLine Pro</h1>
         <p>Strumenti per regolazione e verifica linee aeree</p>
@@ -1527,6 +1527,7 @@ window.addEventListener('beforeinstallprompt', function (event) {
   deferredInstallPrompt = event;
   installPromptReady = true;
   setInstallButtonState('ready');
+  console.log('Installazione PWA pronta');
 });
 
 window.addEventListener('appinstalled', function () {
@@ -1537,7 +1538,7 @@ window.addEventListener('appinstalled', function () {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('./sw.js?v=2004')
+    navigator.serviceWorker.register('./sw.js?v=2005')
       .then(function (registration) {
         console.log('Service Worker registrato');
         if (registration && registration.update) registration.update();
@@ -1565,7 +1566,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (!deferredInstallPrompt) {
-      alert('Se il pulsante non avvia subito installazione: attendi qualche secondo e riprova. In alternativa usa Chrome/Edge menu ⋮ → Installa app. Su iPhone usa Safari → Condividi → Aggiungi alla schermata Home.');
+      await new Promise(resolve => setTimeout(resolve, 1200));
+    }
+
+    if (!deferredInstallPrompt) {
+      alert('Installazione non ancora disponibile. Su PC usa Chrome/Edge menu ⋮ → Salva e condividi → Installa GeoLine Pro. Se hai appena disinstallato l’app, chiudi e riapri il browser e riprova.');
       return;
     }
 
