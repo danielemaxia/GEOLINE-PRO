@@ -1,4 +1,4 @@
-const CACHE_NAME = "geoline-pro-v2003";
+const CACHE_NAME = "geoline-pro-v2004";
 
 const urlsToCache = [
   "./",
@@ -11,20 +11,31 @@ const urlsToCache = [
 ];
 
 self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
   self.skipWaiting();
+
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.all(
+        urlsToCache.map(url =>
+          cache.add(url).catch(err => console.warn("File non messo in cache:", url, err))
+        )
+      )
+    )
+  );
 });
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
-    )
+    caches.keys()
+      .then(keys =>
+        Promise.all(
+          keys
+            .filter(key => key !== CACHE_NAME)
+            .map(key => caches.delete(key))
+        )
+      )
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
